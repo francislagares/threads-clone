@@ -1,4 +1,5 @@
-import { tockenCache } from '@/utils/cache';
+import { useEffect } from 'react';
+
 import { ClerkLoaded, ClerkProvider } from '@clerk/clerk-expo';
 import {
   DMSans_400Regular,
@@ -6,11 +7,17 @@ import {
   DMSans_700Bold,
   useFonts,
 } from '@expo-google-fonts/dm-sans';
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
 import { Slot, SplashScreen } from 'expo-router';
-import { useEffect } from 'react';
 import { LogBox } from 'react-native';
 
+import { tockenCache } from '@/utils/cache';
+
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
+  unsavedChangesWarning: false,
+});
 
 if (!publishableKey) {
   throw new Error(
@@ -43,7 +50,9 @@ export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tockenCache}>
       <ClerkLoaded>
-        <InitialLayout />
+        <ConvexProvider client={convex}>
+          <InitialLayout />
+        </ConvexProvider>
       </ClerkLoaded>
     </ClerkProvider>
   );

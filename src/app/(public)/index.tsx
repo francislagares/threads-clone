@@ -1,6 +1,6 @@
-import { Colors } from '@/constants/Colors';
 import { useOAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
+import { useQuery } from 'convex/react';
 import {
   Image,
   ScrollView,
@@ -10,9 +10,17 @@ import {
   View,
 } from 'react-native';
 
+import { Colors } from '@/constants/Colors';
+import { api } from 'convex/_generated/api';
+
 export default function Index() {
   const { startOAuthFlow: googleAuth } = useOAuth({ strategy: 'oauth_google' });
-  const { startOAuthFlow: facebookAuth } = useOAuth({ strategy: 'oauth_facebook' });
+  const { startOAuthFlow: facebookAuth } = useOAuth({
+    strategy: 'oauth_facebook',
+  });
+
+  const users = useQuery(api.users.getAllUsers);
+  console.log('🚀 ~ LoginScreen ~ users:', users);
 
   const handleFacebookLogin = async () => {
     try {
@@ -46,20 +54,30 @@ export default function Index() {
       />
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>How would you like to use Threads ?</Text>
-        
+
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.loginButton} onPress={handleFacebookLogin}>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={handleFacebookLogin}
+          >
             <View style={styles.loginButtonContent}>
               <Image
                 source={require('@/assets/images/instagram_icon.webp')}
                 style={styles.loginButtonIcon}
               />
-              <Text style={styles.loginButtonText}>Continue with Instagram</Text>
-              <Ionicons name="chevron-forward" size={24} color={Colors.border} />
+              <Text style={styles.loginButtonText}>
+                Continue with Instagram
+              </Text>
+              <Ionicons
+                name='chevron-forward'
+                size={24}
+                color={Colors.border}
+              />
             </View>
             <Text style={styles.loginButtonSubtitle}>
-              Log in or create a THreads profile with your Instagram account. With a profile, you
-              can post, interact and get personalised recommendations.
+              Log in or create a THreads profile with your Instagram account.
+              With a profile, you can post, interact and get personalised
+              recommendations.
             </Text>
           </TouchableOpacity>
 
