@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
 
-import { ClerkLoaded, ClerkProvider } from '@clerk/clerk-expo';
+import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import {
   DMSans_400Regular,
   DMSans_500Medium,
   DMSans_700Bold,
   useFonts,
 } from '@expo-google-fonts/dm-sans';
-import { ConvexProvider, ConvexReactClient } from 'convex/react';
+import { ConvexReactClient } from 'convex/react';
+import { ConvexProviderWithClerk } from 'convex/react-clerk';
 import { Slot, SplashScreen } from 'expo-router';
 import { LogBox } from 'react-native';
 
@@ -50,9 +51,9 @@ export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tockenCache}>
       <ClerkLoaded>
-        <ConvexProvider client={convex}>
+        <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
           <InitialLayout />
-        </ConvexProvider>
+        </ConvexProviderWithClerk>
       </ClerkLoaded>
     </ClerkProvider>
   );
