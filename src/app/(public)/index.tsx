@@ -1,6 +1,5 @@
 import { useOAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery } from 'convex/react';
 import {
   Image,
   ScrollView,
@@ -11,16 +10,12 @@ import {
 } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
-import { api } from 'convex/_generated/api';
 
 export default function Index() {
   const { startOAuthFlow: googleAuth } = useOAuth({ strategy: 'oauth_google' });
   const { startOAuthFlow: facebookAuth } = useOAuth({
     strategy: 'oauth_facebook',
   });
-
-  const users = useQuery(api.users.getAllUsers);
-  console.log('🚀 ~ LoginScreen ~ users:', users);
 
   const handleFacebookLogin = async () => {
     try {
