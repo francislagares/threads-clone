@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 const Page = () => {
   return (
@@ -11,5 +11,3 @@ const Page = () => {
 };
 
 export default Page;
-
-const styles = StyleSheet.create({});

@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 const Page = () => {
   return (
     <View>
-      <Text>Page</Text>
+      <Text>Favorites Page</Text>
     </View>
   );
 };

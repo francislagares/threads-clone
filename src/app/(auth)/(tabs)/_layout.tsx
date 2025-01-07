@@ -2,7 +2,8 @@ import React from 'react';
 
 import { useAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import * as Haptics from 'expo-haptics';
+import { Tabs, useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
@@ -15,6 +16,7 @@ const CreateTabIcon = ({ color, size }: { color: string; size: number }) => (
 
 const Layout = () => {
   const { signOut } = useAuth();
+  const router = useRouter();
 
   return (
     <Tabs
@@ -64,11 +66,19 @@ const Layout = () => {
             <CreateTabIcon color={color} size={size} />
           ),
         }}
+        listeners={{
+          tabPress: e => {
+            e.preventDefault();
+            Haptics.selectionAsync();
+            router.push('/(modal)/create');
+          },
+        }}
       />
       <Tabs.Screen
         name='favorites'
         options={{
           title: 'Favorites',
+          headerShown: false,
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? 'heart' : 'heart-outline'}
@@ -106,6 +116,5 @@ const styles = StyleSheet.create({
   createIconContainer: {
     backgroundColor: Colors.itemBackground,
     borderRadius: 8,
-    padding: 6,
   },
 });
