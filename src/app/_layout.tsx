@@ -1,14 +1,21 @@
 import { useEffect } from 'react';
 
-import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import {
+  ClerkLoaded,
+  ClerkProvider,
+  useAuth,
+  useUser,
+} from '@clerk/clerk-expo';
 import {
   DMSans_400Regular,
   DMSans_500Medium,
   DMSans_700Bold,
   useFonts,
 } from '@expo-google-fonts/dm-sans';
+import * as Sentry from '@sentry/react-native';
 import { ConvexReactClient } from 'convex/react';
 import { ConvexProviderWithClerk } from 'convex/react-clerk';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Slot, SplashScreen, useRouter, useSegments } from 'expo-router';
 import { LogBox } from 'react-native';
 
@@ -28,6 +35,26 @@ if (!publishableKey) {
 
 LogBox.ignoreLogs(['Clerk: Clerk has been loaded with development keys']);
 
+const navigationIntegration = Sentry.reactNavigationIntegration({
+  enableTimeToInitialDisplay:
+    Constants.executionEnvironment === ExecutionEnvironment.StoreClient, // Only in native builds, not in Expo Go.
+});
+
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  debug: true,
+  tracesSampleRate: 1.0,
+  attachScreenshot: true,
+  integrations: [navigationIntegration, Sentry.mobileReplayIntegration()],
+  enableNativeFramesTracking:
+    Constants.executionEnvironment === ExecutionEnvironment.StoreClient, // Only in native builds, not in Expo Go.
+  _experiments: {
+    profileSampleRate: 1.0,
+    replaysOnErrorSampleRate: 1.0,
+    replaysSessionSampleRate: 1.0,
+  },
+});
+
 // Prevent auto hide splash screen
 SplashScreen.preventAutoHideAsync();
 
@@ -40,6 +67,7 @@ const InitialLayout = () => {
   const { isLoaded, isSignedIn } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const { user } = useUser();
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -59,10 +87,21 @@ const InitialLayout = () => {
     }
   }, [isSignedIn]);
 
+  useEffect(() => {
+    if (user) {
+      Sentry.setUser({
+        email: user.emailAddresses[0]?.emailAddress,
+        id: user.id,
+      });
+    } else {
+      Sentry.setUser(null);
+    }
+  }, [user]);
+
   return <Slot />;
 };
 
-export default function RootLayout() {
+const RootLayout = () => {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tockenCache}>
       <ClerkLoaded>
@@ -72,4 +111,6 @@ export default function RootLayout() {
       </ClerkLoaded>
     </ClerkProvider>
   );
-}
+};
+
+export default Sentry.wrap(RootLayout);
